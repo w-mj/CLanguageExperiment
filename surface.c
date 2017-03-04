@@ -5,6 +5,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#define DEBUG gotoxy(0,0);printf("focus=%2d firstPos=%2d lastName=%-10s", focus, firstDisplayCoursePosition, displayList->name);
+
 #define MAX_COURSES_IN_PAGE 20
 
 void login(void)
@@ -123,6 +125,7 @@ void election(courseList * clist)
     int courseTypeListFocus = 0, courseListFocus = 0;
     int firstDisplayCoursePosition = 0; // 第一个要显示的课程在数组中的位置
     bool courseTypeList = true;
+    bool nomore = false; // 向下没有更多元素
     courseType[0] = createChoiceBox(2, 4, BASIC_COLOR, CHOOSEN_COLOR, "人文选修");
     courseType[1] = createChoiceBox(2, 5, BASIC_COLOR, CHOOSEN_COLOR, "公共选修");
     courseType[2] = createChoiceBox(2, 6, BASIC_COLOR, CHOOSEN_COLOR, "专业选修");
@@ -161,26 +164,33 @@ void election(courseList * clist)
         } else {
             setCourseListPositon(courses, firstDisplayCoursePosition);
             setSelect(courses[focus]);
-            gotoxy(0, 0);
-                    printf("%2d", focus);
+            DEBUG
             for (int i = 0; i < MAX_COURSES_IN_PAGE; i++) {
                 showChoiceBox(courses[(firstDisplayCoursePosition + i) % MAX_COURSES_IN_PAGE]);
             }
             cmd = getKeyboard();
             if (cmd == -80) {
                 if ((focus + 1) % MAX_COURSES_IN_PAGE != firstDisplayCoursePosition) {
+                    message("      ");
                     // 没到底
                     clearSelect(courses[focus++]);
                     if (focus == MAX_COURSES_IN_PAGE)
                         focus = 0;
                     setSelect(courses[focus]);
                 } else {
-                    if(addAcourseBox(courses[firstDisplayCoursePosition], displayList)) {
-                        displayList = displayList -> next;
+                    if((!nomore) && addAcourseBox(courses[firstDisplayCoursePosition], displayList)) {
+                            // displayList 始终指向显示列表的最后一个元素
+                        if (displayList -> next != NULL)
+                            displayList = displayList -> next;
+                        else
+                            nomore = true;
+                        message("到底了");
                         firstDisplayCoursePosition += 1;
                         firstDisplayCoursePosition %= MAX_COURSES_IN_PAGE;
                         clearSelect(courses[focus]);
                         focus = firstDisplayCoursePosition - 1;
+                        if (focus < 0)
+                            focus = MAX_COURSES_IN_PAGE - 1;
                         setSelect(courses[focus]);
                         setCourseListPositon(courses, firstDisplayCoursePosition);
                     }
@@ -189,6 +199,7 @@ void election(courseList * clist)
                 if (focus != firstDisplayCoursePosition) {
                     // 没到顶
                     //moveDownCourseList(courses);
+                    message("      ");
                     clearSelect(courses[focus--]);
                     if (focus < 0)
                         focus = MAX_COURSES_IN_PAGE -1;
@@ -196,16 +207,22 @@ void election(courseList * clist)
                     printf("%d", focus);
                     setSelect(courses[focus]);
                 } else {
+
+                    message("到顶了");
                     int t = firstDisplayCoursePosition - 1;
                     t = t < 0 ? MAX_COURSES_IN_PAGE - 1 : t;
                     // TODO
                     if(addAcourseBox(courses[t], lastcourse(courses[firstDisplayCoursePosition] -> courseID, subList))) {
+                        if (!nomore)
+                            displayList = lastcourse(displayList -> id, subList);
+
                         firstDisplayCoursePosition = t;
                         clearSelect(courses[focus]);
                         focus = t;
                         setSelect(courses[focus]);
                         setCourseListPositon(courses, firstDisplayCoursePosition);
                     }
+                    nomore = false;
                 }
             } else if (cmd == -75) {
                 courseTypeList = true;

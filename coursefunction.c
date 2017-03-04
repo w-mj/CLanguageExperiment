@@ -133,7 +133,7 @@ courseList *lastcourse(int id,courseList *head)
     if(id==head->id)
         return(NULL);
     else
-        while(head -> id!= id)
+        while(p -> next -> id!= id)
             {
                 p=p->next;
             }

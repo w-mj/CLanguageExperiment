@@ -20,7 +20,7 @@ int main(void)
     readCourseListFromFile("Users.txt", courseList);
 
     clearColor();
-    login();
+    //login();
 
     setColor(0xb1);
     drawFrame();
