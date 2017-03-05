@@ -16,14 +16,15 @@ studentinformation createstudent(void)//要求id按从小到大的顺序输入
     p1=p2=(studentinformation)malloc(sizeof(struct student));
     for(i=0;i<50;i++)
         p1->courseid[i]=0;
+
     FILE *fp;
-    if((fp=fopen("1.txt","r+"))==NULL)
+    if((fp=fopen("students.txt","r+"))==NULL)
     {
         printf("can not open\n");
         exit(0);
     }
 
-    fscanf(fp,"%d%s%u%d%d%d",&p1->id,p1->name,&p1->major,&p1->classes,&p1->year,&p1->password);
+    fscanf(fp,"%d%s%u%d%d%d%d",&p1->id,p1->name,&p1->major,&p1->classes,&p1->year,&p1->password,&p1->subject);
     head=NULL;
     while(p1->id!=0)
     {
@@ -38,7 +39,7 @@ studentinformation createstudent(void)//要求id按从小到大的顺序输入
         for(i=0;i<50;i++)
         p1->courseid[i]=0;
 
-    fscanf(fp,"%d%s%u%d%d%d",&p1->id,p1->name,&p1->major,&p1->classes,&p1->year,&p1->password);
+       fscanf(fp,"%d%s%u%d%d%d%d",&p1->id,p1->name,&p1->major,&p1->classes,&p1->year,&p1->password,&p1->subject);
     }
     p2->next=NULL;
     return (head);
@@ -48,13 +49,20 @@ studentinformation createstudent(void)//要求id按从小到大的顺序输入
 {
     studentinformation p1;
     FILE *fp;
+    fp = fopen("students.txt", "w");
     p1=head;
     while(p1!=NULL)
     {
-        fprintf(fp,"%d%s%u%d%d%d",p1->id,p1->name,p1->major,p1->classes,p1->year,p1->password);
+        fprintf(fp,"%d %s %u %d %d %d %d ",p1->id,p1->name,p1->major,p1->classes,p1->year,p1->password,p1->subject);
+        int i;
+        for(i=0;i<p1->subject;i++)
+            fprintf(fp,"%d ",p1->courseid[i]);
         p1=p1->next;
     }
+    fprintf(fp, "\n");
+    fclose(fp);
 }
+
 
 studentinformation deletestudent(studentinformation head,int num)//删除第一个结点时有bug
 {

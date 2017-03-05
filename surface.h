@@ -6,7 +6,7 @@
 
 
 studentinformation login(studentinformation stul);
-void election(courseList * clist, studentinformation cstudent);
+int election(courseList * clist, studentinformation cstudent);
 int menu(void);
 void printSyllabus();
 

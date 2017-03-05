@@ -268,7 +268,7 @@ void drawMultipleRect(void)
 void msgBox(int x, int y, int w, int h, const char *text)
 {
     gotoxy(x, y);
-    int countLine = 0;
+    int countLine = 1;
     int countColumn = 0;
     while (*text != '\0') {
         if (*text == '\n' || (countColumn == w && (!(countColumn & 1)))) {

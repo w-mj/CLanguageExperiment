@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <conio.h>
 
 #define DEBUG gotoxy(0,0);printf("focus=%2d firstPos=%2d lastName=%-10s", focus, firstDisplayCoursePosition, displayList->name);
 
@@ -150,7 +151,7 @@ int addAcourseBox(choiceBox cboxList, courseList *clist)
         return 0;
     }
     char tempString[100];
-    sprintf(tempString, "%20s%20s%d%d%d", clist -> name, clist -> teacherName, clist -> credit, clist -> hours);
+    sprintf(tempString, "%-30s%-20s%2d           %2d", clist -> name, clist -> teacherName, clist -> credit, clist -> hours);
     cboxList -> courseID = clist -> id;
     cboxList -> x = 20;
     cboxList -> y = 0;
@@ -164,7 +165,7 @@ int addAcourseBox(choiceBox cboxList, courseList *clist)
 void setCourseListPositon(choiceBox cbl[MAX_COURSES_IN_PAGE], int first)
 {
     for (int i = 0; i< MAX_COURSES_IN_PAGE; i++) {
-        cbl[(first + i) % MAX_COURSES_IN_PAGE] -> y = 7 + i;
+        cbl[(first + i) % MAX_COURSES_IN_PAGE] -> y = 6 + i;
     }
 }
 
@@ -177,8 +178,10 @@ courseList* createCourseBoxListByList(choiceBox cboxList[MAX_COURSES_IN_PAGE], c
     return clist;
 }
 
-void printSyllabus(void)
+void printSyllabus(courseList *cor, studentinformation stu)
 {
+    char tstring[20] = {0};
+    courseList *tclist = NULL;
     clearScreen();
     clearRectMap();
     setArect(0, 0, 60, 30);
@@ -207,11 +210,23 @@ void printSyllabus(void)
     msgBox(2, 16, 4, 4, "五六节课");
     msgBox(2, 21, 4, 4, "七八节课");
     msgBox(2, 26, 4, 4, "九十节课");
-    while(1);
+    // 每个格子宽14，高4 起始[8,5]横向每天+16，纵向+5 对于周a，第b节：
+    // x = (a - 1) * 16 + 8 = 16 * a - 8
+    // y = (b - 1) * 5 + 5 = 5 * b
+    for (int i = 0; i < stu -> subject; i++) {
+        tclist = searchCourseByID(cor, stu->courseid[i]);
+        itoa(tclist->time, tstring, 10);
+        int l = strlen(tstring);
+        for (int j = 0; j < l; j += 2) {
+            msgBox(16 * (tstring[j] - '0') - 8 , 5 * (tstring[j+1] - '0'), 14, 4, tclist ->name);
+        }
+    }
+    //msgBox(40, 10, 4, 4, "一二三四五六七八九十");
+    getch();
 }
 
 
-void election(courseList * clist, studentinformation cstudent)
+int election(courseList * clist, studentinformation cstudent)
 {
     bool quit = false;
     clearScreen();
@@ -226,6 +241,8 @@ void election(courseList * clist, studentinformation cstudent)
     printf("%*s", 10, "");
     resumeColor();
 
+    gotoxy(20, 5);
+    printf("%3s课程%25s教师%16s学分%8s学时", "", "", "" ,"");
     courseList *subList = clist;
     courseList *displayList = subList;
     choiceBox courseType[3] = {0};
@@ -360,8 +377,8 @@ void election(courseList * clist, studentinformation cstudent)
                     showChoiceBox(courses[(firstDisplayCoursePosition + i) % MAX_COURSES_IN_PAGE]);
                 }
             } else if (cmd == 13) {
-                // TODO  按下回车的行为
-                return 0;
+                //  按下回车的行为
+                return courses[focus] -> courseID;
             }
         }
     }
@@ -371,4 +388,26 @@ void election(courseList * clist, studentinformation cstudent)
     for (int i = 0; i < MAX_COURSES_IN_PAGE; i++) {
         destroyChoiceBox(courses[i]);
     }
+}
+
+char *itoA(int a)
+{
+    return itoa(a, TEMP_STRING, 10);
+}
+
+void showStudentInformation(courseList *cour, studentinformation stu)
+{
+    gotoxy(0, 0);
+    clearRectMap();
+    setArect(10, 7, 39, 14);
+    setArect(11, 8, 10, 12);
+    drawMultipleRect();
+    msgLine(52, 10, "姓名：");
+    msgLine(58, 10, stu->name);
+    msgLine(76, 10, "学号：");
+    msgLine(82, 10, itoA(stu->id));
+    msgLine(52, 13, "年级：");
+    msgLine(58, 13, itoA(stu-> year));
+    msgLine(76, 13, "专业：");
+    msgLine(82, 13, itoA((int)stu->major));
 }

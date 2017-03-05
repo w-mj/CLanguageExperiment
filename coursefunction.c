@@ -63,7 +63,7 @@ void readCourseListFromFile(const char *fname,courseList *clist)
     fscanf(fp,"%d",&p->id);
     fscanf(fp,"%s",p->name);
     fscanf(fp,"%s",p->teacherName);
-    fscanf(fp,"%d%d%d%d%u%d%d",&p->credit,&p->hours,&p->maxStudent,&p->student,&p->major,&p->type,&p->grade);
+    fscanf(fp,"%d%d%d%d%u%d%d%d",&p->credit,&p->hours,&p->maxStudent,&p->student,&p->major,&p->type,&p->grade, &p->time);
 
     p->next=q;
 
@@ -75,9 +75,10 @@ while(1)
     {
 
         p->next=q;
+        fscanf(fp,"%d",&q->id);
         fscanf(fp,"%s",q->name);
         fscanf(fp,"%s",q->teacherName);
-        fscanf(fp,"%d%d%d%d%u%d%d",&q->credit,&q->hours,&q->maxStudent,&q->student,&q->major,&q->type,&q->grade);
+        fscanf(fp,"%d%d%d%d%u%d%d%d",&q->credit,&q->hours,&q->maxStudent,&q->student,&q->major,&q->type,&q->grade, &p->time);
        // printf("%d\n",q->id);
         p=q;
         q=q->next;
@@ -93,6 +94,7 @@ while(1)
     return;
 }
 /////////////////////
+/*
 courseList *searchCourse(const char *name,courseList *clist)
 {
     courseList *p;
@@ -107,6 +109,7 @@ courseList *searchCourse(const char *name,courseList *clist)
     }
     return p;
 }
+*/
 
 //////////////////
 courseList *initCourseList(void)
@@ -129,14 +132,14 @@ void destroyCourseList(courseList *clist)
     }
     return;
 }
-courseList *lastcourse(courseList *clist,courseList *head)
+courseList *lastcourse(int id,courseList *head)
 {
     courseList *p;
     p=head;
-    if(clist->id==head->id)
+    if(id==head->id)
         return(NULL);
     else
-        while(p->next->id!=clist->id)
+        while(p->next->id!=id)
             {
                 p=p->next;
             }
@@ -155,4 +158,46 @@ void printCourse(const char *fname,courseList *head)
     }
     fclose(fp);
     return;
+}
+
+char* searchCourseA(char *space, courseList *head, int id)
+{
+    memset(space, 0, sizeof(TEMP_STRING));
+    while (head != NULL) {
+        if (head -> id == id) {
+            strcpy(space, head -> name);
+            return space;
+        }
+        head = head -> next;
+    }
+    return space;
+}
+
+char* searchCourse(courseList *head, int id)
+{
+    return searchCourseA(TEMP_STRING, head, id);
+}
+
+courseList *majorsearch(int major,int grade,int type,courseList *head)
+{
+    courseList *a,*p;
+    a=initCourseList();
+    p=head;
+    while(p!=NULL)
+    {
+        if(((p->major&major)||major==-1)&&((grade==p->grade)||(grade==-1)||(p->grade==0))&&(type==p->type)||(type==-1))
+            addCourse(p,a);
+        p=p->next;
+    }
+    return a;
+}
+
+courseList *searchCourseByID(courseList *clist, int id)
+{
+    while (clist != NULL) {
+        if (clist -> id == id)
+            return clist;
+        else clist = clist -> next;
+    }
+    return NULL;
 }
