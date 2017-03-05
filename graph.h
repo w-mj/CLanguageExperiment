@@ -19,6 +19,7 @@ typedef struct INPUTBOX * inputBox;
 
 inputBox createInputBox(int x, int y, enum StringType type, char * target, int length);
 int input(inputBox box);
+void clearInputBox(inputBox box); // TODO
 void destroyInputBox(inputBox box);
 
 struct CHOICEBOX {
@@ -27,21 +28,27 @@ struct CHOICEBOX {
     unsigned short choosenColor;
     bool choosen;
     char context[100];
-    int courseID;
+    int courseID; // so terrible
+    bool alreadySelected;
+    bool focusOn;
 };
 typedef struct CHOICEBOX *choiceBox;
 
 choiceBox createChoiceBox(int x, int y, unsigned short normalColor, unsigned short choosenColor, const char *text);
+void setAlreadySelected(choiceBox cb);
 void showChoiceBox(choiceBox cb);
 void changeStatus(choiceBox cb);
 void setSelect(choiceBox cb);
 void clearSelect(choiceBox cb);
 void destroyChoiceBox(choiceBox cb);
+void focusOff(choiceBox cb[], int n);
+void focusOn(choiceBox cb[], int n);
 
 void drawRect(int x, int y, int w, int h, bool fill);
 void message(const char * context);
 void errorMsg(const char * context);
-void msgBox(int x, int y, int w, int h, const char * text);
+void msgLine(int x, int y, const char * text);
+void msgBox(int x, int y, int w, int h, const char *text);
 
 // 以下三个函数配套使用
 void clearRectMap(void);  // 清除缓存的矩形（开始画矩形之前执行一次这个函数）

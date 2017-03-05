@@ -15,15 +15,16 @@ void addCourse(courseList *clist,courseList *head)
         p->next=(courseList*)malloc(sizeof(courseList));
         p=p->next;
     }
+    p->id=clist->id;
      strcpy(p->name,clist->name);
      strcpy(p->teacherName,clist->teacherName);
-     p->id=clist->id;
      p->credit=clist->credit;
      p->hours=clist->hours;
      p->maxStudent=clist->maxStudent;
      p->student=clist->student;
      p->major=clist->major;
      p->type=clist->type;
+     p->grade=clist->grade;
      p->next=NULL;
      return;
 }
@@ -35,7 +36,7 @@ void removeCourse(courseList *clist,courseList *head)
 
     if(head->id==clist->id)
     {
-        printf("o1k\n");
+       // printf("o1k\n");
        head=head->next;
     }
     else
@@ -57,25 +58,27 @@ void readCourseListFromFile(const char *fname,courseList *clist)
 {
     FILE *fp;
     fp=fopen(fname,"r+");
-    if (fp == NULL) {
-        fprintf(stderr, "打开文件失败");
-        exit(2);
-    }
     courseList *p,*q;
     p=clist;
+    fscanf(fp,"%d",&p->id);
     fscanf(fp,"%s",p->name);
     fscanf(fp,"%s",p->teacherName);
-    fscanf(fp,"%d%d%d%d%d%u%d",&p->id,&p->credit,&p->hours,&p->maxStudent,&p->student,&p->major,&p->type);
+    fscanf(fp,"%d%d%d%d%u%d%d",&p->credit,&p->hours,&p->maxStudent,&p->student,&p->major,&p->type,&p->grade);
+
     p->next=q;
 
+//printf("ok\n");
 while(1)
 {
     q=initCourseList();
-    if(fscanf(fp,"%s",q->name)!=EOF)
+    if(fscanf(fp,"%d",&q->id)!=EOF)
     {
+
         p->next=q;
+        fscanf(fp,"%s",q->name);
         fscanf(fp,"%s",q->teacherName);
-        fscanf(fp,"%d%d%d%d%d%u%d",&q->id,&q->credit,&q->hours,&q->maxStudent,&q->student,&q->major,&q->type);
+        fscanf(fp,"%d%d%d%d%u%d%d",&q->credit,&q->hours,&q->maxStudent,&q->student,&q->major,&q->type,&q->grade);
+       // printf("%d\n",q->id);
         p=q;
         q=q->next;
     }
@@ -126,16 +129,30 @@ void destroyCourseList(courseList *clist)
     }
     return;
 }
-courseList *lastcourse(int id,courseList *head)
+courseList *lastcourse(courseList *clist,courseList *head)
 {
     courseList *p;
     p=head;
-    if(id==head->id)
+    if(clist->id==head->id)
         return(NULL);
     else
-        while(p -> next -> id!= id)
+        while(p->next->id!=clist->id)
             {
                 p=p->next;
             }
             return p;
+}
+void printCourse(const char *fname,courseList *head)
+{
+    FILE *fp;
+    fp=fopen(fname,"w+");
+    courseList *q;
+    q=head;
+    while(q!=NULL)
+    {
+        fprintf(fp,"%d %s %s %d %d %d %d %u %d %d\n",q->id,q->name,q->teacherName,q->credit,q->hours,q->maxStudent,q->student,q->major,q->type,q->grade);
+        q=q->next;
+    }
+    fclose(fp);
+    return;
 }

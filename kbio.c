@@ -19,7 +19,7 @@ int getString(char * content, enum StringType type, int start, int length)
     int ch;
     while (count <= length) {
         ch = getKeyboard();
-        if (ch == 8) {
+        if (ch == 8 && count > 0) {
             // ÍË¸ñ
             printf("\b \b");
             count -= 1;

@@ -2,7 +2,12 @@
 #define SURFACE_H_INCLUDED
 
 #include "courseList.h"
-void login(void);
-void election(courseList * clist);
+#include "studentsInformation.h"
+
+
+studentinformation login(studentinformation stul);
+void election(courseList * clist, studentinformation cstudent);
+int menu(void);
+void printSyllabus();
 
 #endif // SURFACE_H_INCLUDED

@@ -55,9 +55,9 @@ void clearColor(void)
 
 void clearScreen(void)
 {
+    setTempColor(0x0f);
     system("cls");
-    //COORD coord={0,0};
-    //SetConsoleCursorPosition(hConsole, coord);
+    resumeColor();
 }
 
 void hideCursor(void)

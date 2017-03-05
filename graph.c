@@ -49,7 +49,7 @@ void errorMsg(const char * context)
     resumeColor();
 }
 
-void msgBox(int x, int y, int w, int h, const char * text)
+void msgLine(int x, int y, const char * text)
 {
     gotoxy(x, y);
     while (*text != '\0') {
@@ -71,6 +71,10 @@ inputBox createInputBox(int x, int y, enum StringType type, char * target, int l
     ans -> length = length;
     ans -> target = target;
     return ans;
+}
+void setAlreadySelected(choiceBox cb)
+{
+    cb -> alreadySelected = true;
 }
 
 int input(inputBox box)
@@ -95,6 +99,8 @@ choiceBox createChoiceBox(int x, int y, unsigned short normalColor, unsigned sho
     ret -> normalColor = normalColor;
     ret -> choosenColor = choosenColor;
     ret -> choosen = false;
+    ret -> alreadySelected = false;
+    ret -> focusOn = true;
     strcpy(ret -> context, text);
     return ret;
 }
@@ -102,11 +108,15 @@ choiceBox createChoiceBox(int x, int y, unsigned short normalColor, unsigned sho
 void showChoiceBox(choiceBox cb)
 {
     gotoxy(cb -> x, cb -> y);
+    if (cb -> alreadySelected) {
+        setColor(cb -> focusOn? cb -> normalColor: (cb -> normalColor) | 0x07);
+        printf("¡Ì%s", cb -> context);
+    }
     if (cb -> choosen) {
-        setColor(cb -> choosenColor);
+        setColor(cb -> focusOn? cb -> choosenColor: (cb -> choosenColor) | 0x07);
         printf("¡ú%s", cb -> context);
     } else  {
-        setColor(cb -> normalColor);
+        setColor(cb -> focusOn? cb -> normalColor: (cb -> normalColor) | 0x07);
         printf("¡ñ%s", cb -> context);
     }
 }
@@ -131,7 +141,7 @@ void destroyChoiceBox(choiceBox cb)
     free(cb);
 }
 
-int rectMap[60][30] = {0};
+int rectMap[60][30];
 
 void addMap(int * a, int b)
 {
@@ -252,4 +262,47 @@ void drawMultipleRect(void)
         }
     }
 
+}
+
+
+void msgBox(int x, int y, int w, int h, const char *text)
+{
+    gotoxy(x, y);
+    int countLine = 0;
+    int countColumn = 0;
+    while (*text != '\0') {
+        if (*text == '\n' || (countColumn == w && (!(countColumn & 1)))) {
+            if (countLine == h)
+                break;
+            else {
+                gotoxy(x, ++y);
+                countLine++;
+                countColumn = 0;
+            }
+        }
+
+            printf("%c", *text);
+        text++;
+        countColumn++;
+    }
+}
+
+void clearInputBox(inputBox box)
+{
+    gotoxy(box->x, box->y);
+    printf("%*s", box->length, "");
+    box -> owned = 0;
+}
+
+void focusOff(choiceBox cb[], int n)
+{
+    for (int i = 0; i < n; i++) {
+        cb[i] -> focusOn = false;
+    }
+}
+void focusOn(choiceBox cb[], int n)
+{
+    for (int i = 0; i < n; i++) {
+        cb[i] -> focusOn = true;
+    }
 }
