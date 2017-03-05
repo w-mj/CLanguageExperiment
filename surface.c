@@ -151,7 +151,7 @@ int addAcourseBox(choiceBox cboxList, courseList *clist)
         return 0;
     }
     char tempString[100];
-    sprintf(tempString, "%-30s%-20s%2d           %2d", clist -> name, clist -> teacherName, clist -> credit, clist -> hours);
+    sprintf(tempString, "%-30s%-20s%2d           %-3d", clist -> name, clist -> teacherName, clist -> credit, clist -> hours);
     cboxList -> courseID = clist -> id;
     cboxList -> x = 20;
     cboxList -> y = 0;
@@ -159,12 +159,15 @@ int addAcourseBox(choiceBox cboxList, courseList *clist)
     cboxList -> choosenColor = CHOOSEN_COLOR;
     strcpy(cboxList -> context , tempString);
     cboxList -> choosen = false;
+    cboxList -> exist = true;
     return 1;
 }
 
 void setCourseListPositon(choiceBox cbl[MAX_COURSES_IN_PAGE], int first)
 {
     for (int i = 0; i< MAX_COURSES_IN_PAGE; i++) {
+        if (cbl[i] -> exist == false)
+            continue;
         cbl[(first + i) % MAX_COURSES_IN_PAGE] -> y = 6 + i;
     }
 }
@@ -172,8 +175,12 @@ void setCourseListPositon(choiceBox cbl[MAX_COURSES_IN_PAGE], int first)
 courseList* createCourseBoxListByList(choiceBox cboxList[MAX_COURSES_IN_PAGE], courseList *clist)
 {
     for (int i = 0; i < MAX_COURSES_IN_PAGE ; i++) {
-        addAcourseBox(cboxList[i], clist);
-        clist = clist -> next;
+        if(clist != NULL) {
+            addAcourseBox(cboxList[i], clist);
+            clist = clist -> next;
+        }
+        else
+            cboxList[i] -> exist = false;
     }
     return clist;
 }
@@ -213,7 +220,9 @@ void printSyllabus(courseList *cor, studentinformation stu)
     // 每个格子宽14，高4 起始[8,5]横向每天+16，纵向+5 对于周a，第b节：
     // x = (a - 1) * 16 + 8 = 16 * a - 8
     // y = (b - 1) * 5 + 5 = 5 * b
-    for (int i = 0; i < stu -> subject; i++) {
+    for (int i = 0; i < stu -> endOfCourseArray; i++) {
+        if (stu -> endOfCourseArray == 0)
+            continue;
         tclist = searchCourseByID(cor, stu->courseid[i]);
         itoa(tclist->time, tstring, 10);
         int l = strlen(tstring);
@@ -226,6 +235,24 @@ void printSyllabus(courseList *cor, studentinformation stu)
 }
 
 
+int countElements(courseList *clist)
+{
+    int a = 0;
+    while (clist != NULL) {
+        a++;
+        clist = clist -> next;
+    }
+    return a;
+}
+
+void clear()
+{
+    setColor(BASIC_COLOR);
+    for (int i = 0 ; i < 20; i++) {
+        gotoxy(20, 6 + i);
+        printf("%*s", 90, "");
+    }
+}
 int election(courseList * clist, studentinformation cstudent)
 {
     bool quit = false;
@@ -243,8 +270,8 @@ int election(courseList * clist, studentinformation cstudent)
 
     gotoxy(20, 5);
     printf("%3s课程%25s教师%16s学分%8s学时", "", "", "" ,"");
-    courseList *subList = clist;
-    courseList *displayList = subList;
+    courseList *displayList;
+    courseList *searchVer1 = NULL, *selectable;
     choiceBox courseType[3] = {0};
     choiceBox courses[MAX_COURSES_IN_PAGE] = { 0 };
     for (int i = 0; i < MAX_COURSES_IN_PAGE; i++) {
@@ -253,12 +280,15 @@ int election(courseList * clist, studentinformation cstudent)
     int focus = 0, cmd = 0;
     int courseTypeListFocus = 0, courseListFocus = 0;
     int firstDisplayCoursePosition = 0; // 第一个要显示的课程在数组中的位置
+    int numberOfelements = MAX_COURSES_IN_PAGE;
     bool courseTypeList = true;
     bool nomore = false; // 向下没有更多元素
     courseType[0] = createChoiceBox(2, 4, BASIC_COLOR, CHOOSEN_COLOR, "人文选修");
     courseType[1] = createChoiceBox(2, 5, BASIC_COLOR, CHOOSEN_COLOR, "公共选修");
     courseType[2] = createChoiceBox(2, 6, BASIC_COLOR, CHOOSEN_COLOR, "专业选修");
-    createCourseBoxListByList(courses, displayList);
+    selectable = majorsearch(cstudent -> major, cstudent -> year, -1, clist); // selectable 储存的是这名学生所在专业和年级的课程
+    displayList = selectable;
+    createCourseBoxListByList(courses, displayList);//?
     setCourseListPositon(courses, firstDisplayCoursePosition);
     focusOff(courses, MAX_COURSES_IN_PAGE);
     for (int i = 0; i < MAX_COURSES_IN_PAGE; i++) {
@@ -295,18 +325,28 @@ int election(courseList * clist, studentinformation cstudent)
                 courseTypeListFocus = focus;
                 focus = courseListFocus;
                 focusOff(courseType, 3);
+                focusOn(courses, MAX_COURSES_IN_PAGE);
             } else if (cmd == 13) {
                 // 刷新课程列表 TODO
+                free(searchVer1);
+                searchVer1 = majorsearch(-1, -1, focus, selectable);
+                numberOfelements = countElements(searchVer1);
+                displayList = searchVer1;
+                for (int i = 0; i < MAX_COURSES_IN_PAGE; i++)
+                    courses[i] -> exist = false;
                 displayList  = createCourseBoxListByList(courses, displayList);
                 courseTypeList = false;
                 courseTypeListFocus = focus;
-                focus = courseListFocus;
+                focus = 0;
+                firstDisplayCoursePosition = 0;
                 focusOff(courseType, 3);
+                focusOn(courses, MAX_COURSES_IN_PAGE);
+                clear();
             }
         } else {
-            focusOn(courses, MAX_COURSES_IN_PAGE);
             setCourseListPositon(courses, firstDisplayCoursePosition);
             setSelect(courses[focus]);
+            //clear();
             for (int i = 0; i < MAX_COURSES_IN_PAGE; i++) {
                 showChoiceBox(courses[(firstDisplayCoursePosition + i) % MAX_COURSES_IN_PAGE]);
             }
@@ -314,9 +354,9 @@ int election(courseList * clist, studentinformation cstudent)
 
             cmd = getKeyboard();
             if (cmd == -80) {
-                if ((focus + 1) % MAX_COURSES_IN_PAGE != firstDisplayCoursePosition) {
-                    //message("      ");
-                    // 没到底
+                if ( numberOfelements < MAX_COURSES_IN_PAGE || (focus + 1) % MAX_COURSES_IN_PAGE != firstDisplayCoursePosition) {
+                    if (numberOfelements < MAX_COURSES_IN_PAGE && focus +1 >= numberOfelements)
+                        continue;
                     clearSelect(courses[focus++]);
                     if (focus == MAX_COURSES_IN_PAGE)
                         focus = 0;
@@ -356,9 +396,9 @@ int election(courseList * clist, studentinformation cstudent)
                     int t = firstDisplayCoursePosition - 1;
                     t = t < 0 ? MAX_COURSES_IN_PAGE - 1 : t;
                     // TODO
-                    if(addAcourseBox(courses[t], lastcourse(courses[firstDisplayCoursePosition] -> courseID, subList))) {
+                    if(addAcourseBox(courses[t], lastcourse(courses[firstDisplayCoursePosition] -> courseID, searchVer1))) {
                         if (!nomore)
-                            displayList = lastcourse(displayList -> id, subList);
+                            displayList = lastcourse(displayList -> id, searchVer1);
 
                         firstDisplayCoursePosition = t;
                         clearSelect(courses[focus]);
@@ -388,6 +428,8 @@ int election(courseList * clist, studentinformation cstudent)
     for (int i = 0; i < MAX_COURSES_IN_PAGE; i++) {
         destroyChoiceBox(courses[i]);
     }
+    free(selectable);
+    return -1;
 }
 
 char *itoA(int a)

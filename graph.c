@@ -101,13 +101,20 @@ choiceBox createChoiceBox(int x, int y, unsigned short normalColor, unsigned sho
     ret -> choosen = false;
     ret -> alreadySelected = false;
     ret -> focusOn = true;
+    ret -> exist = true;
     strcpy(ret -> context, text);
     return ret;
 }
 
 void showChoiceBox(choiceBox cb)
 {
+    //gotoxy(cb -> x, cb -> y);
+    //setColor(cb -> normalColor);
+    //printf("%*s", strlen(cb -> context), "");
     gotoxy(cb -> x, cb -> y);
+    if (cb -> exist == false) {
+        return;
+    }
     if (cb -> alreadySelected) {
         setColor(cb -> focusOn? cb -> normalColor: (cb -> normalColor) | 0x07);
         printf("¡Ì%s", cb -> context);

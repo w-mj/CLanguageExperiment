@@ -116,6 +116,7 @@ courseList *initCourseList(void)
 {
     courseList *p;
     p=(courseList*)malloc(sizeof(courseList));
+    memset(p, 0, sizeof(courseList));
     return p;
 }
 //////////////
@@ -189,6 +190,9 @@ courseList *majorsearch(int major,int grade,int type,courseList *head)
             addCourse(p,a);
         p=p->next;
     }
+    p = a;
+    a = a -> next;
+    free(p);
     return a;
 }
 

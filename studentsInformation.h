@@ -12,6 +12,7 @@ struct student
     int password;//密码
     int credit;//已选学分
     int subject;//已选课程数
+    int endOfCourseArray; // 已选课程数组的大小（只增不减，为了方便循环）
     unsigned int major;//专业
     int classes;//班级
     int year;//学年

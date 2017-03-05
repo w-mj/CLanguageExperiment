@@ -31,6 +31,7 @@ struct CHOICEBOX {
     int courseID; // so terrible
     bool alreadySelected;
     bool focusOn;
+    bool exist;
 };
 typedef struct CHOICEBOX *choiceBox;
 

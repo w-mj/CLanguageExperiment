@@ -1,6 +1,7 @@
 #include<stdio.h>
 #include<string.h>
 #include<stdlib.h>
+#include <stdbool.h>
 #include"studentsInformation.h"
 #include "courseList.h"
 
@@ -9,43 +10,35 @@ int studentnum;//ÒÑ×¢²áÑ§ÉúÊı
 
 studentinformation createstudent(void)//ÒªÇóid°´´ÓĞ¡µ½´óµÄË³ĞòÊäÈë
 {
-    studentinformation head,p1,p2;
-    studentnum=0;
-    int i=0,j=0;
-
-    p1=p2=(studentinformation)malloc(sizeof(struct student));
-    for(i=0;i<50;i++)
-        p1->courseid[i]=0;
-
-    FILE *fp;
-    if((fp=fopen("students.txt","r+"))==NULL)
-    {
-        printf("can not open\n");
-        exit(0);
+    studentinformation ret = NULL, cursor = NULL;
+    FILE* fp = fopen("students.txt", "r+");
+    if (fp == NULL) {
+        fprintf(stderr, "Fail to open student data.\n");
+        exit(10);
     }
-
-    fscanf(fp,"%d%s%u%d%d%d%d",&p1->id,p1->name,&p1->major,&p1->classes,&p1->year,&p1->password,&p1->subject);
-    head=NULL;
-    while(p1->id!=0)
-    {
-        studentnum++;
-
-        p1->credit=0;
-        p1->subject=0;
-        if(studentnum==1)head=p1;
-        else p2->next=p1;
-        p2=p1;
-        p1=(studentinformation)malloc(sizeof(struct student));
-        for(i=0;i<50;i++)
-        p1->courseid[i]=0;
-
-       fscanf(fp,"%d%s%u%d%d%d%d",&p1->id,p1->name,&p1->major,&p1->classes,&p1->year,&p1->password,&p1->subject);
+    int tempID;
+    bool first = true;
+    while(~fscanf(fp, "%d", &tempID)) {
+        if (first) {
+            ret = cursor = (studentinformation)malloc(sizeof(struct student));
+            first = false;
+        } else {
+            cursor -> next = (studentinformation)malloc(sizeof(struct student));
+            cursor = cursor -> next;
+        }
+        cursor -> next = NULL;
+        cursor -> id = tempID;
+        fscanf(fp, "%s%u%d%d%d%d%d",
+               cursor -> name, &cursor -> major, &cursor -> classes, &cursor -> year, &cursor -> password, &cursor -> credit, &cursor -> subject);
+        cursor -> endOfCourseArray = cursor -> subject;
+        for (int i = 0; i < cursor -> subject; i++) {
+            fscanf(fp, "%d", &cursor -> courseid[i]);
+        }
     }
-    p2->next=NULL;
-    return (head);
+    return ret;
 }
 
- void writeback(studentinformation head)//ÒªÇóid°´´ÓĞ¡µ½´óµÄË³ĞòÊäÈë
+void writeback(studentinformation head)//ÒªÇóid°´´ÓĞ¡µ½´óµÄË³ĞòÊäÈë
 {
     studentinformation p1;
     FILE *fp;
@@ -53,13 +46,16 @@ studentinformation createstudent(void)//ÒªÇóid°´´ÓĞ¡µ½´óµÄË³ĞòÊäÈë
     p1=head;
     while(p1!=NULL)
     {
-        fprintf(fp,"%d %s %u %d %d %d %d ",p1->id,p1->name,p1->major,p1->classes,p1->year,p1->password,p1->subject);
+        fprintf(fp,"%d %s %u %d %d %d %d %d ",p1->id,p1->name,p1->major,p1->classes,p1->year,p1->password,p1 -> credit, p1->subject);
         int i;
-        for(i=0;i<p1->subject;i++)
+        for(i=0;i<p1->endOfCourseArray;i++) {
+            if (p1 -> courseid[i] == 0)
+                continue;
             fprintf(fp,"%d ",p1->courseid[i]);
+        }
+        fprintf(fp, "\n");
         p1=p1->next;
     }
-    fprintf(fp, "\n");
     fclose(fp);
 }
 
@@ -166,7 +162,7 @@ void deletecourse(int id,studentinformation stu,courselist head)//Ñ§ÉúÉ¾³ı¿Î³Ì
         p1->student--;
         for(i=0;i<stu->subject;i++)
             if(stu->courseid[i]==id)
-            stu->courseid[i]=0;
+            stu->courseid[i]=0; // ¶èĞÔÉ¾³ı
         stu->credit=stu->credit-p1->credit;
         stu->subject--;
 
@@ -198,7 +194,7 @@ void findstud(int id,studentinformation head)//²éÕÒÔÚ´Ë¿Î³ÌÀïµÄÑ§ÉúÈËÊıºÍÑ§ÉúÃûµ
 
 int chooseclass(int cid,studentinformation stu,courselist head)//Ñ§ÉúÊäÈë¿Î³Ì±àºÅ½øĞĞÑ¡¿Î£»
 {
-    courselist p1,p2;
+    courselist p1;
     p1=head;
     while((p1->id!=cid)&&(p1->next!=NULL))
         p1=p1->next;
@@ -211,6 +207,7 @@ int chooseclass(int cid,studentinformation stu,courselist head)//Ñ§ÉúÊäÈë¿Î³Ì±àº
         }
         stu->courseid[stu->subject]=cid;
         stu->subject++;
+        stu -> endOfCourseArray++;
         stu->credit+=p1->credit;
         if(stu->credit>50)
             return 1; //µ±Ñ§ÉúµÄÑ§·Ö´óÓÚ50Ê±£¬ÌáĞÑÑ§ÉúÑ§·ÖÒÑ¾­×ã¹»¡£
