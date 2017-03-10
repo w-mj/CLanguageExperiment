@@ -58,8 +58,7 @@ void readCourseListFromFile(const char *fname,courseList *clist)
 {
     FILE *fp;
     fp=fopen(fname,"r+");
-    courseList *p,*q;
-    p=clist;
+    courseList *p = clist,*q;
     fscanf(fp,"%d",&p->id);
     fscanf(fp,"%s",p->name);
     fscanf(fp,"%s",p->teacherName);

@@ -7,6 +7,7 @@
 studentinformation login(studentinformation stul);
 int election(courseList * clist, studentinformation cstudent);
 int menu(studentinformation stu);
+void showStudentInformation(courseList* cour, studentinformation stu);
 void printSyllabus();
 
 #endif // SURFACE_H_INCLUDED

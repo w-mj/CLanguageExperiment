@@ -61,5 +61,6 @@ void inputDialog(const char *text, char * target);
 bool confirm(const char *text);
 
 void clearMsg(unsigned short color);
+void clearMsg0(unsigned short color);
 
 #endif // GRAPH_H_INCLUDED

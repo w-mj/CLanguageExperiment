@@ -1,6 +1,7 @@
 #include "kbio.h"
 #include <ctype.h>
 #include <conio.h>
+#include <stdio.h>
 
 unsigned int getKeyboard(void)
 {

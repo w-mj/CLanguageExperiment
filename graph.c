@@ -137,10 +137,14 @@ void showChoiceBox(choiceBox cb)
         return;
     }
     if (cb -> alreadySelected) {
-        setColor(cb -> focusOn? cb -> normalColor: (cb -> normalColor) | 0x07);
-        printf("¡Ì%s", cb -> context);
-    }
-    if (cb -> choosen) {
+        if (cb -> choosen) {
+            setColor(cb -> focusOn? cb -> choosenColor: (cb -> normalColor) | 0x07);
+            printf("¡Ì%s", cb -> context);
+        } else {
+            setColor(cb -> focusOn? cb -> normalColor: (cb -> normalColor) | 0x07);
+            printf("¡Ì%s", cb -> context);
+        }
+    } else if (cb -> choosen) {
         setColor(cb -> focusOn? cb -> choosenColor: (cb -> choosenColor) | 0x07);
         printf("¡ú%s", cb -> context);
     } else  {

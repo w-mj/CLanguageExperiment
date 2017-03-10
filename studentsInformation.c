@@ -65,7 +65,7 @@ studentinformation deletestudent(studentinformation head,int num)//É¾³ıµÚÒ»¸ö½áµ
     studentinformation p1,p2;
     if(head==NULL)
     {
-        printf("list NULL!\n");
+        //printf("list NULL!\n");
         return(head);
     }
     else
@@ -80,11 +80,12 @@ studentinformation deletestudent(studentinformation head,int num)//É¾³ıµÚÒ»¸ö½áµ
         {
             if(p1==head)head=p1->next;
             else p2->next=p1->next;
-            printf("delete students'id:%d\n",num);
+            //printf("delete students'id:%d\n",num);
             studentnum--;
         }
         else
-            printf("can't find this id\n");
+            errorMsg("Ã»ÓĞÕâ¸öÑ§Éú");
+            //printf("can't find this id\n");
         return head;
     }
 }

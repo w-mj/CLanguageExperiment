@@ -276,17 +276,18 @@ int election(courseList * clist, studentinformation cstudent)
     courseList *searchVer1 = NULL, *searchVer2 = NULL, *selectable;
     choiceBox courseType[3] = {0};
     choiceBox courses[MAX_COURSES_IN_PAGE] = { 0 };
+    /*
     for (int i = 0; i < MAX_COURSES_IN_PAGE; i++) {
         courses[i] = createChoiceBox(0, 0, 0, 0, "");
-    }
+    } */
     int focus = 0, cmd = 0;
     int courseTypeListFocus = 0, courseListFocus = 0;
     int firstDisplayCoursePosition = 0; // 第一个要显示的课程在数组中的位置
     int numberOfelements = MAX_COURSES_IN_PAGE;
     bool courseTypeList = true;
     bool nomore = false; // 向下没有更多元素
-    courseType[0] = createChoiceBox(2, 4, BASIC_COLOR, CHOOSEN_COLOR, "人文选修");
-    courseType[1] = createChoiceBox(2, 5, BASIC_COLOR, CHOOSEN_COLOR, "公共选修");
+    courseType[0] = createChoiceBox(2, 4, BASIC_COLOR, CHOOSEN_COLOR, "公共选修");
+    courseType[1] = createChoiceBox(2, 5, BASIC_COLOR, CHOOSEN_COLOR, "人文选修");
     courseType[2] = createChoiceBox(2, 6, BASIC_COLOR, CHOOSEN_COLOR, "专业选修");
     selectable = majorsearch(cstudent -> major, cstudent -> year, -1, clist); // selectable 储存的是这名学生所在专业和年级的课程
     displayList = selectable;
@@ -455,7 +456,7 @@ int election(courseList * clist, studentinformation cstudent)
 
 char *itoA(int a)
 {
-    return itoa(a, TEMP_STRING, 10);
+    return (char *)itoa(a, TEMP_STRING, 10);
 }
 
 void showStudentInformation(courseList *cour, studentinformation stu)
