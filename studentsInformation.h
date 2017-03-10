@@ -9,7 +9,7 @@ struct student
     int id;
     char name[20];
     int courseid[500];
-    int password;//密码
+    char password[20];//密码
     int credit;//已选学分
     int subject;//已选课程数
     int endOfCourseArray; // 已选课程数组的大小（只增不减，为了方便循环）
@@ -34,7 +34,7 @@ studentinformation findstudent(int num,studentinformation head);//按学号查找学生
 void printstudent(studentinformation head);
 void deletecourse(int id,studentinformation stu,courselist head);//学生删除课程
 void findstud(int id,studentinformation head);//查找在此课程里的学生人数和学生名单，输入课程编号。
-// 返回值说明：-1为课程人数已满，-2为查无此课，0为选课成功，1为选课成功且学分足够
+// 返回值说明：-1为课程人数已满，-2为查无此课，0为选课成功，1为选课成功且学分足够,2为已经选过
 int chooseclass(int cid,studentinformation stu,courselist head);//学生输入课程编号进行选课；
 
 

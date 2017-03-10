@@ -4,10 +4,9 @@
 #include "courseList.h"
 #include "studentsInformation.h"
 
-
 studentinformation login(studentinformation stul);
 int election(courseList * clist, studentinformation cstudent);
-int menu(void);
+int menu(studentinformation stu);
 void printSyllabus();
 
 #endif // SURFACE_H_INCLUDED

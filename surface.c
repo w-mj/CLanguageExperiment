@@ -15,13 +15,13 @@
 studentinformation login(studentinformation stul)
 {
     studentinformation cursor = stul;
-    const int x = 33, y = 10;
+    const int x = 34, y = 10;
     int cmd = 0;
     bool quit = false;
     char id[20] = {0}, psd[20] = {0};
     int nID, nPSD;
     clearScreen();
-    showCursor();
+
     //setColor(0xff);
     //drawRect(x+2, y-1, 20, 5, true);
     setColor(0xad);
@@ -35,12 +35,13 @@ studentinformation login(studentinformation stul)
     int focus = 0;
     while(!quit) {
         cmd = input(iBox[focus]);
-        if (cmd == -80 || cmd == 9) {
+        clearMsg(0x0f);
+        if ((cmd & 0xff00) && (cmd & 0x00ff) == 80 || cmd == 9) {
             // 下箭头和tab
             if (focus < 1)
                 focus++;
         }
-        else if (cmd == -72) {
+        else if ((cmd & 0xff00) && (cmd & 0x00ff) == 72) {
             // 上箭头
             if (focus > 0)
             focus--;
@@ -53,10 +54,10 @@ studentinformation login(studentinformation stul)
             } else {
                 //printf("\n%s\n%s\n", id, psd);
                 nID = atoi(id);
-                nPSD = atoi(psd);
+                //nPSD = atoi(psd);
                 while (cursor != NULL) {
                     if (cursor -> id == nID) {
-                        if (cursor -> password == nPSD) {
+                        if (strcmp(cursor -> password, psd) == 0) {
                             quit = true;
                             break;
                         } else {
@@ -81,7 +82,7 @@ studentinformation login(studentinformation stul)
     }
     destroyInputBox(iBox[0]);
     destroyInputBox(iBox[1]);
-    hideCursor();
+
     return cursor;
 }
 
@@ -95,49 +96,46 @@ void drawFrame(void)
     drawMultipleRect();
 }
 
-int menu(void)
+int menu(studentinformation s)
 {
     const int x = 21, y = 8;
     int focus = 0;
-    char ch;
+    int cmd;
     clearScreen();
     setColor(BASIC_COLOR);
     clearRectMap();
     setArect(x, y, 15, 13);
-    /*
-    setArect(x + 1, y + 1, 13, 3);
-    setArect(x + 1, y + 4, 13, 3);
-    setArect(x + 1, y + 7, 13, 3);
-    setArect(x + 1, y + 10, 13, 3);
-    setArect(x + 1, y + 13, 13, 3);
-    */
+
     drawMultipleRect();
     choiceBox choiceList[5];
     choiceList[0] = createChoiceBox(2*x+4, y+2, BASIC_COLOR, CHOOSEN_COLOR, "     课程列表       ");
     choiceList[1] = createChoiceBox(2*x+4, y+4, BASIC_COLOR, CHOOSEN_COLOR, "     个人信息       ");
     choiceList[2] = createChoiceBox(2*x+4, y+6, BASIC_COLOR, CHOOSEN_COLOR, "     修改密码       ");
-    choiceList[3] = createChoiceBox(2*x+4, y+8, BASIC_COLOR, CHOOSEN_COLOR, "     查看课表       ");
+    if (s -> id != 0)
+        choiceList[3] = createChoiceBox(2*x+4, y+8, BASIC_COLOR, CHOOSEN_COLOR, "     查看课表       ");
+    else
+        choiceList[3] = createChoiceBox(2*x+4, y+8, BASIC_COLOR, CHOOSEN_COLOR, "     修改设置       ");
     choiceList[4] = createChoiceBox(2*x+4, y+10, BASIC_COLOR, CHOOSEN_COLOR, "     退出系统       ");
     setSelect(choiceList[focus]);
     while(1) {
         for(int i = 0; i < 5; i++) {
             showChoiceBox(choiceList[i]);
         }
-        ch = getKeyboard();
-        if (ch == -80) {
+        cmd = getKeyboard();
+        if ((cmd & 0xff00) && (cmd & 0x00ff) == 80) {
             if (focus != 4) {
                 clearSelect(choiceList[focus]);
                 focus++;
                 setSelect(choiceList[focus]);
             }
         }
-        if (ch == -72) {
+        if ((cmd & 0xff00) && (cmd & 0x00ff) == 72) {
             if (focus != 0) {
                 clearSelect(choiceList[focus]);
                 focus--;
                 setSelect(choiceList[focus]);
             }
-        } if (ch == 13)
+        } if (cmd == 13)
             return focus;
 
     }
@@ -268,10 +266,14 @@ int election(courseList * clist, studentinformation cstudent)
     printf("%*s", 10, "");
     resumeColor();
 
+    char tempName[100];
+    //inputBox searchBox;
+    //searchBox = createInputBox(106, 3, chinese, searchName, 20);
+
     gotoxy(20, 5);
     printf("%3s课程%25s教师%16s学分%8s学时", "", "", "" ,"");
     courseList *displayList;
-    courseList *searchVer1 = NULL, *selectable;
+    courseList *searchVer1 = NULL, *searchVer2 = NULL, *selectable;
     choiceBox courseType[3] = {0};
     choiceBox courses[MAX_COURSES_IN_PAGE] = { 0 };
     for (int i = 0; i < MAX_COURSES_IN_PAGE; i++) {
@@ -306,21 +308,22 @@ int election(courseList * clist, studentinformation cstudent)
             showChoiceBox(courseType[1]);
             showChoiceBox(courseType[2]);
             cmd = getKeyboard();
-            if (cmd == -80) {
+            clearMsg0(BASIC_COLOR);
+            if ((cmd & 0xff00) && (cmd & 0x00ff) == 80) {
                 if (focus == 2)
                     continue;
                 else {
                     clearSelect(courseType[focus++]);
                     setSelect(courseType[focus]);
                 }
-            } else if (cmd == -72) {
+            } else if ((cmd & 0xff00) && (cmd & 0x00ff) == 72) {
                 if (focus == 0)
                     continue;
                 else {
                     clearSelect(courseType[focus--]);
                     setSelect(courseType[focus]);
                 }
-            } else if (cmd == -77) {
+            } else if ((cmd & 0xff00) && (cmd & 0x00ff) == 77) {
                 courseTypeList = false;
                 courseTypeListFocus = focus;
                 focus = courseListFocus;
@@ -328,7 +331,7 @@ int election(courseList * clist, studentinformation cstudent)
                 focusOn(courses, MAX_COURSES_IN_PAGE);
             } else if (cmd == 13) {
                 // 刷新课程列表 TODO
-                free(searchVer1);
+                destroyCourseList(searchVer1);
                 searchVer1 = majorsearch(-1, -1, focus, selectable);
                 numberOfelements = countElements(searchVer1);
                 displayList = searchVer1;
@@ -342,7 +345,8 @@ int election(courseList * clist, studentinformation cstudent)
                 focusOff(courseType, 3);
                 focusOn(courses, MAX_COURSES_IN_PAGE);
                 clear();
-            }
+            } else if (cmd == 'q')
+                return -1;
         } else {
             setCourseListPositon(courses, firstDisplayCoursePosition);
             setSelect(courses[focus]);
@@ -353,7 +357,8 @@ int election(courseList * clist, studentinformation cstudent)
             //DEBUG
 
             cmd = getKeyboard();
-            if (cmd == -80) {
+            clearMsg0(BASIC_COLOR);
+            if ((cmd & 0xff00) && (cmd & 0x00ff) == 80) {
                 if ( numberOfelements < MAX_COURSES_IN_PAGE || (focus + 1) % MAX_COURSES_IN_PAGE != firstDisplayCoursePosition) {
                     if (numberOfelements < MAX_COURSES_IN_PAGE && focus +1 >= numberOfelements)
                         continue;
@@ -379,7 +384,7 @@ int election(courseList * clist, studentinformation cstudent)
                         setCourseListPositon(courses, firstDisplayCoursePosition);
                     }
                 }
-            } if (cmd == -72) {
+            } if ((cmd & 0xff00) && (cmd & 0x00ff) == 72) {
                 if (focus != firstDisplayCoursePosition) {
                     // 没到顶
                     //moveDownCourseList(courses);
@@ -408,7 +413,7 @@ int election(courseList * clist, studentinformation cstudent)
                     }
                     nomore = false;
                 }
-            } else if (cmd == -75) {
+            } else if ((cmd & 0xff00) && (cmd & 0x00ff) == 75) {
                 courseTypeList = true;
                 courseListFocus = focus;
                 focus = courseTypeListFocus;
@@ -418,7 +423,23 @@ int election(courseList * clist, studentinformation cstudent)
                 }
             } else if (cmd == 13) {
                 //  按下回车的行为
-                return courses[focus] -> courseID;
+                if (courses[focus] -> exist)
+                    return courses[focus] -> courseID;
+            } else if (cmd == 'q')
+                return -1;
+            else if (cmd == 's') {
+                inputDialog("请输入课程名称", tempName);
+                destroyCourseList(searchVer2);
+                searchVer2 = namesearch(tempName, clist);
+                destroyCourseList(searchVer1);
+                searchVer1 = searchVer2;
+                displayList = searchVer1;
+                for (int i = 0; i < MAX_COURSES_IN_PAGE; i++)
+                    courses[i] -> exist = false;
+                displayList  = createCourseBoxListByList(courses, displayList);
+                focus = 0;
+                firstDisplayCoursePosition = 0;
+                clear();
             }
         }
     }
@@ -453,3 +474,59 @@ void showStudentInformation(courseList *cour, studentinformation stu)
     msgLine(76, 13, "专业：");
     msgLine(82, 13, itoA((int)stu->major));
 }
+
+
+void changePsd(studentinformation stu)
+{
+    char oldPsd[20], newPsd[20], rePsd[20];
+    clearScreen();
+    int x = 16, y = 8;
+    inputBox list[3];
+    list[0] = createInputBox(2 * x + 14, y + 2, password, oldPsd, 15);
+    list[1] = createInputBox(2 * x + 14, y + 5, password, newPsd, 15);
+    list[2] = createInputBox(2 * x + 14, y + 8, password, rePsd, 15);
+    int focus = 0;
+    clearRectMap();
+    setArect(x, y, 25, 13);
+    setArect(x + 6, y + 1, 18, 3);
+    setArect(x + 6, y + 4, 18, 3);
+    setArect(x + 6, y + 7, 18, 3);
+    drawMultipleRect();
+    msgLine(2 * x + 3, y + 2, "  旧密码");
+    msgLine(2 * x + 3, y + 5, "  新密码");
+    msgLine(2 * x + 3, y + 8, "重复密码");
+    bool quit = false;
+    int cmd;
+    while(!quit)
+    {
+        cmd = input(list[focus]);
+        switch(cmd & 0x00ff)
+        {
+        case 80:
+        case 9:
+            if (focus < 2) {
+                focus += 1;
+            }
+            break;
+        case 72:
+            if (focus > 0) {
+                focus -= 1;
+            }
+            break;
+        case 13:
+            if (strcmp(stu -> password, oldPsd) == 0) {
+                if (strcmp(newPsd, rePsd) == 0) {
+                    strcpy(stu -> password, newPsd);
+                    dialog("密码修改成功");
+                    quit = true;
+                } else {
+                    errorMsg("两次密码不一致");
+                }
+            } else  {
+                errorMsg("旧密码输入错误");
+            }
+            break;
+        }
+    }
+}
+

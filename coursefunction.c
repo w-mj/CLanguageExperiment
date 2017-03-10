@@ -205,3 +205,51 @@ courseList *searchCourseByID(courseList *clist, int id)
     }
     return NULL;
 }
+
+courseList *namesearch(const char *name,courseList *clist)
+{
+    int i,j,k=0,flag,m;
+    courseList *p,*a;
+    a=initCourseList();
+    p=clist;
+    char c[20];
+
+   // printf("name==%s\n",p->name);
+    strcpy(c,name);
+        while(p!=NULL)
+        {
+
+           int n=strlen(p->name);
+
+           for(i=0;i<n;i++)
+           {
+               j=0;
+               flag=0;
+               m=strlen(c);
+               k=i;
+               for(j=0;j<m;j++,k++)
+               {
+                    if(p->name[k]!=c[j])
+                    {
+                        flag=1;
+                        break;
+                    }
+               }
+               if(flag==0)
+               {
+                   addCourse(p,a);
+                    break;
+               }
+
+           }
+
+           p=p->next;
+        }
+        p = a;
+        a = a -> next;
+        free(p);
+        if(a->id==0)
+            return NULL;
+        else
+         return a;
+    }

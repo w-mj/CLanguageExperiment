@@ -56,4 +56,10 @@ void clearRectMap(void);  // 清除缓存的矩形（开始画矩形之前执行一次这个函数）
 void setArect(int x, int y, int w, int h);  // 向矩形缓存中增加一个矩形
 void drawMultipleRect(void);  // 把缓存写到屏幕上
 
+void dialog(const char *text);
+void inputDialog(const char *text, char * target);
+bool confirm(const char *text);
+
+void clearMsg(unsigned short color);
+
 #endif // GRAPH_H_INCLUDED

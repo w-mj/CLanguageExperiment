@@ -49,6 +49,25 @@ void errorMsg(const char * context)
     resumeColor();
 }
 
+void clearMsg(unsigned short color)
+{
+    gotoxy(0, 29);
+    setTempColor(color);
+    printf("%*s", 120, "");
+    resumeColor();
+}
+
+void clearMsg0(unsigned short color)
+{
+    gotoxy(0, 29);
+    setTempColor(color);
+    printf("©ª");
+    for(int i = 0; i < 58; i++)
+        printf("©•");
+    printf("©ø");
+    resumeColor();
+}
+
 void msgLine(int x, int y, const char * text)
 {
     gotoxy(x, y);
@@ -80,9 +99,11 @@ void setAlreadySelected(choiceBox cb)
 int input(inputBox box)
 {
     int ret;
+    showCursor();
     gotoxy(box -> x + box -> owned, box -> y);
     ret = getString(box -> target, box -> type, box -> owned, box -> length);
     box -> owned = strlen(box -> target);
+    hideCursor();
     return ret;
 }
 
@@ -312,4 +333,80 @@ void focusOn(choiceBox cb[], int n)
     for (int i = 0; i < n; i++) {
         cb[i] -> focusOn = true;
     }
+}
+
+void dialog(const char *text)
+{
+    const int x = 37, y = 11;
+    setColor(BASIC_COLOR);
+    clearRectMap();
+    setArect(x / 2, y, 20, 5);
+    drawMultipleRect();
+    gotoxy(x + 2, y + 1);
+    printf("%s", text);
+    setColor(CHOOSEN_COLOR);
+    gotoxy(x + 15, y + 3);
+    printf("   OK   ");
+    setColor(BASIC_COLOR);
+    while(getKeyboard() != 13)
+        ;
+}
+
+bool confirm(const char *text)
+{
+    const int x = 37, y = 11;
+    setColor(BASIC_COLOR);
+    clearRectMap();
+    setArect(x / 2, y, 20, 5);
+    drawMultipleRect();
+    gotoxy(x + 2, y + 1);
+    printf("%s", text);
+    int ch, focus = 0;;
+
+    choiceBox button[2];
+    button[0] = createChoiceBox(x + 7, y + 3, BASIC_COLOR, CHOOSEN_COLOR, " CANCLE ");
+    button[1] = createChoiceBox(x + 21, y + 3, BASIC_COLOR, CHOOSEN_COLOR, "   OK   ");
+    setSelect(button[0]);
+
+    while(ch != 13)
+    {
+        showChoiceBox(button[0]);
+        showChoiceBox(button[1]);
+        ch = getKeyboard();
+        if ((ch & 0xff00) && (ch & 0x00ff) == 77) {
+            // œÚ”“
+            if (focus < 1) {
+                clearSelect(button[focus]);
+                focus += 1;
+                setSelect(button[focus]);
+            }
+        } else if ((ch & 0xff00) && (ch & 0x00ff) == 75) {
+            // œÚ”“
+            if (focus > 0) {
+                clearSelect(button[focus]);
+                focus -= 1;
+                setSelect(button[focus]);
+            }
+        }
+    }
+    return focus;
+}
+
+void inputDialog(const char *text, char * target)
+{
+    const int x = 37, y = 11;
+    setColor(BASIC_COLOR);
+    clearRectMap();
+    setArect(x / 2, y, 20, 5);
+    drawMultipleRect();
+    gotoxy(x + 2, y + 1);
+    printf(text);
+    inputBox inp = createInputBox(x + 2, y + 2, chinese, target, 14);
+    setColor(CHOOSEN_COLOR);
+    gotoxy(x + 15, y + 3);
+    printf("   OK   ");
+    setColor(BASIC_COLOR);
+    input(inp);
+    while(getchar() != '\n')
+        ;
 }

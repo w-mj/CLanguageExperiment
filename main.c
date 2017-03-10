@@ -16,54 +16,78 @@ int main(void)
     hideCursor();
     clearColor();
     clearScreen();
+    char temp[1000];
     //setColor(0x0f);
 
-    courseList * courseList = NULL;
+    courseList * clist = NULL;
     studentinformation studentList = NULL;
     studentinformation currentStudent = NULL;
-    courseList = initCourseList();
+    clist = initCourseList();
     studentList = createstudent();
-    readCourseListFromFile("course.txt", courseList);
+    readCourseListFromFile("course.txt", clist);
 
 
-    //printSyllabus();
     //getch();
     currentStudent = login(studentList);
     while(!quit) {
 
-        cmd = menu();
+        cmd = menu(currentStudent);
         switch(cmd) {
             case 0:
-                courseID = election(courseList, currentStudent);
-                ret = chooseclass(courseID, currentStudent, courseList);
-                switch(ret) {
-                case -2:
-                    errorMsg("选课失败，无此课程，按任意键返回");
-                    break;
-                case -1:
-                    errorMsg("该门课程人数已满，按任意键返回");
-                    break;
-                case 0:
-                    errorMsg("选课成功，按任意键返回");
-                    break;
-                case 1:
-                    errorMsg("选课成功，您的学分已经足够，按任意键返回");
-                    break;
+                while(1) {
+                    courseID = election(clist, currentStudent);
+                    if (courseID == -1)
+                        break;
+                    if (currentStudent -> id == 0) {
+                        dialog("教师不能选课");
+                        continue;
+                    }
+                    strcpy(temp, "你确定要选择：");
+                    strcat(temp, searchCourse(clist, courseID));
+                    strcat(temp, "  吗？");
+
+                    if (confirm(temp)) {
+                        ret = chooseclass(courseID, currentStudent, clist);
+                        switch(ret) {
+                        case -2:
+                            dialog("选课失败，无此课程");
+                            break;
+                        case -1:
+                            dialog("该门课程人数已满");
+                            break;
+                        case 0:
+                            dialog("选课成功");
+                            break;
+                        case 1:
+                            dialog("选课成功，您的学分已经足够");
+                            break;
+                        case 2:
+                            dialog("您已经选过该门课程，请勿重复选课");
+                            break;
+                        }
+                    }
                 }
-                getch();
                 break;
             case 1:
                 clearScreen();
-                showStudentInformation(courseList, currentStudent);
+                showStudentInformation(clist, currentStudent);
                 getch();
                 break;
+            case 2:
+                changePsd(currentStudent);
+                break;
             case 3:
-                printSyllabus(courseList, currentStudent);
+                if (currentStudent -> id != 0)
+                    printSyllabus(clist, currentStudent);
+                else
+                    teacherOperate(currentStudent, clist);
                 break;
             case 4:
                 quit = true;
                 break;
         }
+        //while(getchar() != '\n');
+
     }
     writeback(studentList);
     clearColor();

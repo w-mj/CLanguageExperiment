@@ -2,52 +2,82 @@
 #include <ctype.h>
 #include <conio.h>
 
-int getKeyboard(void)
+unsigned int getKeyboard(void)
 {
-    int ch;
+    unsigned int ch;
+    unsigned int ret = 0;
     ch = getch();
+    //printf("**");
     //printf("%d\n", ch);
-    if (ch == 224) // 方向键等特殊字符
-        ch = -getch();
-    //printf("%d\n", ch);
-    return ch;
+    if (ch & 0x80) {
+        // 如果最高位是1 再读一位
+        ret = ch << 8;
+        ch = getch();
+        ret += ch;
+    } else {
+        ret = ch;
+    }
+    //gotoxy(0, 0);
+    //printf("%x\n", ret);
+    return ret;
 }
 
-int getString(char * content, enum StringType type, int start, int length)
+int getString(unsigned char * content, enum StringType type, int start, int length)
 {
     int count = start;
-    int ch;
-    while (count <= length) {
-        ch = getKeyboard();
-        if (ch == 8 && count > 0) {
-            // 退格
-            printf("\b \b");
-            count -= 1;
-        }
+    unsigned int ch;
+    if (type == chinese) {
+        scanf("%s", content);
+    } else {
+        while (count <= length) {
+            ch = getKeyboard();
+            //clearMsg();
+            //printf("%x\n", ch);
+                if (ch == 9 || ch == 13 ||
+                (ch & 0xff00) && (((ch & 0x00ff) == 80) || ((ch & 0x00ff) == 72) || ((ch & 0x00ff) == 75 ) || ((ch & 0x00ff) == 77)))
+            { // 遇控制字符 直接返回
 
-        if (ch == 9 || ch == -80 || ch == 13 || ch == -72) {
-            content[count] = '\0';
-            return ch;
+                content[count] = '\0';
+                return ch;
+            }
+
+            if (ch == 8 && count > 0) {
+                // 退格
+                printf("\b \b");
+                count -= 1;
+            }
+
+            if (count == length)
+                continue;
+
+            if (type == chinese) {
+                if (isalnum(ch)) {
+                    putchar(ch);
+                    content[count++] = ch;
+                } else {
+                    putchar((ch & 0xff00) >> 8);
+                    putchar(ch & 0x00ff);
+                    content[count++] = (ch & 0xff00) >> 8;
+                    content[count++] = ch;
+                }
+            } else if (type == text) {
+                if (isalnum(ch)) {
+                    putchar(ch);
+                    content[count++] = ch;
+                }
+            } else if (type == number) {
+                if (isdigit(ch)) {
+                    putchar(ch);
+                    content[count++] = ch;
+                }
+            } else if (type == password) {
+                if (isprint(ch)) {
+                    putchar('*');
+                    content[count++] = ch;
+                }
+            }
         }
-        if (count == length)
-            continue;
-        if (type == text) {
-            if (isalnum(ch)) {
-                putchar(ch);
-                content[count++] = ch;
-            }
-        } else if (type == number) {
-            if (isdigit(ch)) {
-                putchar(ch);
-                content[count++] = ch;
-            }
-        } else if (type == password) {
-            if (isprint(ch)) {
-                putchar('*');
-                content[count++] = ch;
-            }
-        }
+        content[count] = '\0';
     }
-    content[count] = '\0';
     return 0;
 }

@@ -31,10 +31,10 @@ void removeCourse(courseList *clist,courseList *head);  // 删除一门课,按id查找
 void destroyCourseList(courseList *clist);   // 销毁课程列表
 void printCourse(const char *fname,courseList *head);//输出课程列表到文件中
 courseList *lastcourse(int id,courseList *head);//返回前一个指针,若目标为头指针则返回NULL
-courseList *majorsearch(int major,int grade,int type,courseList *head);//按专业和年级查找
-char* searchCourseA(char *space, courseList *head, int id);
+char* searchCourse(courseList *head, int id);
 courseList *majorsearch(int major,int grade,int type,courseList *head);//按专业和年级查找
 courseList *searchCourseByID(courseList *clist, int id);
+courseList *namesearch( const char * name,courseList *clist);  // 按名字查找一门课，返回指向这门课的指针，未找到返回NULL
 
 
 #endif // CLASELIST_H_INCLUDED

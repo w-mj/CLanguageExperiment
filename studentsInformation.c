@@ -28,7 +28,7 @@ studentinformation createstudent(void)//ÒªÇóid°´´ÓĞ¡µ½´óµÄË³ĞòÊäÈë
         }
         cursor -> next = NULL;
         cursor -> id = tempID;
-        fscanf(fp, "%s%u%d%d%d%d%d",
+        fscanf(fp, "%s%u%d%d%s%d%d",
                cursor -> name, &cursor -> major, &cursor -> classes, &cursor -> year, &cursor -> password, &cursor -> credit, &cursor -> subject);
         cursor -> endOfCourseArray = cursor -> subject;
         for (int i = 0; i < cursor -> subject; i++) {
@@ -46,7 +46,7 @@ void writeback(studentinformation head)//ÒªÇóid°´´ÓĞ¡µ½´óµÄË³ĞòÊäÈë
     p1=head;
     while(p1!=NULL)
     {
-        fprintf(fp,"%d %s %u %d %d %d %d %d ",p1->id,p1->name,p1->major,p1->classes,p1->year,p1->password,p1 -> credit, p1->subject);
+        fprintf(fp,"%d %s %u %d %d %s %d %d ",p1->id,p1->name,p1->major,p1->classes,p1->year,p1->password,p1 -> credit, p1->subject);
         int i;
         for(i=0;i<p1->endOfCourseArray;i++) {
             if (p1 -> courseid[i] == 0)
@@ -204,6 +204,10 @@ int chooseclass(int cid,studentinformation stu,courselist head)//Ñ§ÉúÊäÈë¿Î³Ì±àº
         if(p1->student>p1->maxStudent) {
             p1 -> student -= 1;
             return -1;
+        }
+        for (int i = 0; i < stu -> subject; i++) {
+            if (stu -> courseid[i] == cid)
+                return 2;
         }
         stu->courseid[stu->subject]=cid;
         stu->subject++;
