@@ -18,14 +18,14 @@ int main(void)
     hideCursor();
     clearColor();
     clearScreen();
-    char temp[1000];
+    char temp[100];
     //setColor(0x0f);
 
     courseList * clist = NULL;
     studentinformation studentList = NULL;
     studentinformation currentStudent = NULL;
-    clist = initCourseList();
     studentList = createstudent();
+    clist = initCourseList();
     readCourseListFromFile("course.txt", clist);
 
 
@@ -82,7 +82,7 @@ int main(void)
                 if (currentStudent -> id != 0)
                     printSyllabus(clist, currentStudent);
                 else
-                    teacherOperate(currentStudent, clist);
+                    teacherOperate(clist, studentList);
                 break;
             case 4:
                 quit = true;
@@ -92,6 +92,7 @@ int main(void)
 
     }
     writeback(studentList);
+    printCourse("course.txt", clist);
     clearColor();
     gotoxy(0, 0);
     destroyConsole();

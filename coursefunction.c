@@ -2,7 +2,7 @@
 #include<stdlib.h>
 #include<string.h>
 #include"courseList.h"
-void addCourse(courseList *clist,courseList *head)
+void addCourse(courseList *clist, courseList *head)
 {
     courseList *p;
     p=head;
@@ -13,20 +13,24 @@ void addCourse(courseList *clist,courseList *head)
             p=p->next;
         }
         p->next=(courseList*)malloc(sizeof(courseList));
+        memset(p -> next, 0, sizeof(courseList));
         p=p->next;
+    } else {
+        p = (courseList*)malloc(sizeof(courseList));
+        memset(p, 0, sizeof(courseList));
     }
     p->id=clist->id;
-     strcpy(p->name,clist->name);
-     strcpy(p->teacherName,clist->teacherName);
-     p->credit=clist->credit;
-     p->hours=clist->hours;
-     p->maxStudent=clist->maxStudent;
-     p->student=clist->student;
-     p->major=clist->major;
-     p->type=clist->type;
-     p->grade=clist->grade;
-     p->next=NULL;
-     return;
+    strcpy(p->name,clist->name);
+    strcpy(p->teacherName,clist->teacherName);
+    p->credit=clist->credit;
+    p->hours=clist->hours;
+    p->maxStudent=clist->maxStudent;
+    p->student=clist->student;
+    p->major=clist->major;
+    p->type=clist->type;
+    p->grade=clist->grade;
+    p->next=NULL;
+    return;
 }
 /////////////////////
 void removeCourse(courseList *clist,courseList *head)
@@ -41,7 +45,7 @@ void removeCourse(courseList *clist,courseList *head)
     }
     else
     {
-        q=p->next;
+         q=p->next;
          while(q->id!=clist->id)
         {
             p=q;
@@ -58,12 +62,12 @@ void readCourseListFromFile(const char *fname,courseList *clist)
 {
     FILE *fp;
     fp=fopen(fname,"r+");
-    courseList *p = clist,*q;
+    courseList *p,*q;
+    p=clist;
     fscanf(fp,"%d",&p->id);
     fscanf(fp,"%s",p->name);
     fscanf(fp,"%s",p->teacherName);
-    fscanf(fp,"%d%d%d%d%u%d%d%d",&p->credit,&p->hours,&p->maxStudent,&p->student,&p->major,&p->type,&p->grade, &p->time);
-
+    fscanf(fp,"%d%d%d%d%u%d%d%d",&p->credit,&p->hours,&p->maxStudent,&p->student,&p->major,&p->type,&p->grade,&p->time);
     p->next=q;
 
 //printf("ok\n");
@@ -74,11 +78,10 @@ while(1)
     {
 
         p->next=q;
-        fscanf(fp,"%d",&q->id);
         fscanf(fp,"%s",q->name);
         fscanf(fp,"%s",q->teacherName);
-        fscanf(fp,"%d%d%d%d%u%d%d%d",&q->credit,&q->hours,&q->maxStudent,&q->student,&q->major,&q->type,&q->grade, &p->time);
-       // printf("%d\n",q->id);
+        fscanf(fp,"%d%d%d%d%u%d%d%d",&q->credit,&q->hours,&q->maxStudent,&q->student,&q->major,&q->type,&q->grade,&q->time);
+        // printf("%d\n",q->id);
         p=q;
         q=q->next;
     }
@@ -153,7 +156,7 @@ void printCourse(const char *fname,courseList *head)
     q=head;
     while(q!=NULL)
     {
-        fprintf(fp,"%d %s %s %d %d %d %d %u %d %d\n",q->id,q->name,q->teacherName,q->credit,q->hours,q->maxStudent,q->student,q->major,q->type,q->grade);
+        fprintf(fp,"%d %s %s %d %d %d %d %u %d %d %d\n",q->id,q->name,q->teacherName,q->credit,q->hours,q->maxStudent,q->student,q->major,q->type,q->grade, q -> time);
         q=q->next;
     }
     fclose(fp);
@@ -198,6 +201,8 @@ courseList *majorsearch(int major,int grade,int type,courseList *head)
 courseList *searchCourseByID(courseList *clist, int id)
 {
     while (clist != NULL) {
+        if (clist -> next == NULL)
+            getch();
         if (clist -> id == id)
             return clist;
         else clist = clist -> next;
@@ -207,17 +212,15 @@ courseList *searchCourseByID(courseList *clist, int id)
 
 courseList *namesearch(const char *name,courseList *clist)
 {
-    int i,j,k=0,flag,m;
+    int i,j,k=0,flag,m,e=0;
     courseList *p,*a;
     a=initCourseList();
     p=clist;
     char c[20];
-
    // printf("name==%s\n",p->name);
     strcpy(c,name);
         while(p!=NULL)
         {
-
            int n=strlen(p->name);
 
            for(i=0;i<n;i++)
@@ -237,17 +240,13 @@ courseList *namesearch(const char *name,courseList *clist)
                if(flag==0)
                {
                    addCourse(p,a);
+                   e++;
                     break;
                }
-
            }
-
            p=p->next;
         }
-        p = a;
-        a = a -> next;
-        free(p);
-        if(a->id==0)
+        if(e==0)
             return NULL;
         else
          return a;

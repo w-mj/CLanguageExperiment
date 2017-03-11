@@ -384,7 +384,7 @@ courseList *_addCourse(void)
             break;
         case 13:
             // 回车
-            if (!(strlen(id) && strlen(major) && strlen(credit) && strlen(hours)
+            if (!(strlen(id)  && strlen(credit) && strlen(hours)
                   && strlen(maxStu) && strlen(grade))) {
                 errorMsg("有未填写的项目");
                 continue;
@@ -394,11 +394,12 @@ courseList *_addCourse(void)
             ret -> hours = atoi(hours);
             ret -> maxStudent = atoi(maxStu);
             ret -> grade = atoi(grade);
+            ret -> type = typeFocus;
 
             for (int w = 0; w < 7; w++) {
                 for (int t = 0; t < 5; t++) {
                     if (syllabus[t][w]) {
-                        ret -> time = (ret -> time) * 100 + w * 10 + t;
+                        ret -> time = (ret -> time) * 100 + (w + 1) * 10 + ( t + 1);
                     }
                 }
             }
@@ -417,6 +418,7 @@ void teacherOperate(courseList *cl, studentinformation stu)
     bool quit = false;
     char temp[200];
     int cmd;
+    courseList *ta;
     while(!quit)
     {
         cmd = t_menu();
@@ -430,11 +432,14 @@ void teacherOperate(courseList *cl, studentinformation stu)
             deletestudent(stu, atoi(temp));
             break;
         case 2:
-            addCourse(_addCourse(), cl);
+            ta = _addCourse();
+            addCourse(ta, cl);
+            free(ta);
             break;
         case 3:
             inputDialog("输入课程编号", temp);
-            removeCourse(cl, searchCourseByID(cl, atoi(temp)));
+            ta = searchCourseByID(cl, atoi(temp));
+            removeCourse(ta, cl);
             break;
         case 4:
             return;

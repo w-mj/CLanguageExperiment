@@ -276,10 +276,10 @@ int election(courseList * clist, studentinformation cstudent)
     courseList *searchVer1 = NULL, *searchVer2 = NULL, *selectable;
     choiceBox courseType[3] = {0};
     choiceBox courses[MAX_COURSES_IN_PAGE] = { 0 };
-    /*
+
     for (int i = 0; i < MAX_COURSES_IN_PAGE; i++) {
         courses[i] = createChoiceBox(0, 0, 0, 0, "");
-    } */
+    }
     int focus = 0, cmd = 0;
     int courseTypeListFocus = 0, courseListFocus = 0;
     int firstDisplayCoursePosition = 0; // 第一个要显示的课程在数组中的位置
@@ -432,6 +432,7 @@ int election(courseList * clist, studentinformation cstudent)
                 inputDialog("请输入课程名称", tempName);
                 destroyCourseList(searchVer2);
                 searchVer2 = namesearch(tempName, clist);
+                searchVer2 = searchVer2 -> next;
                 destroyCourseList(searchVer1);
                 searchVer1 = searchVer2;
                 displayList = searchVer1;
