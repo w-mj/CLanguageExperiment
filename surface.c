@@ -175,6 +175,10 @@ courseList* createCourseBoxListByList(choiceBox cboxList[MAX_COURSES_IN_PAGE], c
     for (int i = 0; i < MAX_COURSES_IN_PAGE ; i++) {
         if(clist != NULL) {
             addAcourseBox(cboxList[i], clist);
+
+            /*if (isChoosen(clist -> id, stu)) {
+                setAlreadySelected(cboxList[i]);
+            }*/
             clist = clist -> next;
         }
         else
@@ -467,6 +471,9 @@ void showStudentInformation(courseList *cour, studentinformation stu)
     setArect(10, 7, 39, 14);
     setArect(11, 8, 10, 12);
     drawMultipleRect();
+    gotoxy(27, 10);
+    char face[] = "<(£ﬁ£≠£ﬁ)>";
+    printf(face);
     msgLine(52, 10, "–’√˚£∫");
     msgLine(58, 10, stu->name);
     msgLine(76, 10, "—ß∫≈£∫");
@@ -499,6 +506,7 @@ void changePsd(studentinformation stu)
     msgLine(2 * x + 3, y + 8, "÷ÿ∏¥√‹¬Î");
     bool quit = false;
     int cmd;
+
     while(!quit)
     {
         cmd = input(list[focus]);

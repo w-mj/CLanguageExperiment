@@ -413,6 +413,5 @@ void inputDialog(const char *text, char * target)
     printf("   OK   ");
     setColor(BASIC_COLOR);
     input(inp);
-    while(getchar() != '\n')
-        ;
+    fflush(stdin);
 }

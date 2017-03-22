@@ -47,6 +47,7 @@ int t_menu()
             }
         } else if (cmd == 13) {
             return focus;
+
         } else if (cmd == 'q')
             return -1;
     }
@@ -453,12 +454,14 @@ void teacherOperate(courseList *cl, studentinformation stu)
 
 
             if (stu_f != NULL && cor_f != NULL) {
-                if ( confirm("检测到备份文件，是否恢复")) {
+                if (confirm("检测到备份文件，是否恢复")) {
                     system("resume.bat");
                     message("恢复成功");
                     break;
                 }
             }
+
+            fflush(stdin);
 
             if (confirm("是否进行备份")) {
                     system("bk.bat");

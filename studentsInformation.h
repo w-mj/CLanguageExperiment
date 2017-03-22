@@ -38,4 +38,5 @@ void findstud(int id,studentinformation head);//查找在此课程里的学生人数和学生名
 int chooseclass(int cid,studentinformation stu,courselist head);//学生输入课程编号进行选课；
 
 
+
 #endif // STUDENT'S_INFORMATION_H_INCLUDED

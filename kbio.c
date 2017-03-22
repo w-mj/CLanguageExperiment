@@ -28,7 +28,7 @@ int getString(unsigned char * content, enum StringType type, int start, int leng
     int count = start;
     unsigned int ch;
     if (type == chinese) {
-        scanf("%s", content);
+        scanf("%s", content); // TODO
     } else {
         while (count <= length) {
             ch = getKeyboard();
