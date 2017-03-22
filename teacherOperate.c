@@ -25,7 +25,7 @@ int t_menu()
     choiceList[1] = createChoiceBox(2*x+4, y+4, BASIC_COLOR, CHOOSEN_COLOR, "     删除学生       ");
     choiceList[2] = createChoiceBox(2*x+4, y+6, BASIC_COLOR, CHOOSEN_COLOR, "     添加课程       ");
     choiceList[3] = createChoiceBox(2*x+4, y+8, BASIC_COLOR, CHOOSEN_COLOR, "     删除课程       ");
-    choiceList[4] = createChoiceBox(2*x+4, y+10, BASIC_COLOR, CHOOSEN_COLOR, "     返回上级       ");
+    choiceList[4] = createChoiceBox(2*x+4, y+10, BASIC_COLOR, CHOOSEN_COLOR, "     备份恢复       ");
     setSelect(choiceList[focus]);
     while(1) {
         for(int i = 0; i < 5; i++) {
@@ -39,15 +39,16 @@ int t_menu()
                 setSelect(choiceList[focus]);
             }
         }
-        if ((cmd & 0xff00) && (cmd & 0x00ff) == 72) {
+        else if ((cmd & 0xff00) && (cmd & 0x00ff) == 72) {
             if (focus != 0) {
                 clearSelect(choiceList[focus]);
                 focus--;
                 setSelect(choiceList[focus]);
             }
-        } if (cmd == 13)
+        } else if (cmd == 13) {
             return focus;
-
+        } else if (cmd == 'q')
+            return -1;
     }
     return -1;
 }
@@ -421,11 +422,16 @@ void teacherOperate(courseList *cl, studentinformation stu)
     char temp[200];
     int cmd;
     courseList *ta;
+    FILE * stu_f = fopen("students.bak", "r");
+    FILE * cor_f = fopen("course.bak", "r");
     while(!quit)
     {
         cmd = t_menu();
         switch(cmd)
         {
+        case -1:
+            return;
+            break;
         case 0:
             insertstudent(stu, addStudent());
             break;
@@ -444,8 +450,28 @@ void teacherOperate(courseList *cl, studentinformation stu)
             removeCourse(ta, cl);
             break;
         case 4:
-            return;
+
+
+            if (stu_f != NULL && cor_f != NULL) {
+                if ( confirm("检测到备份文件，是否恢复")) {
+                    system("resume.bat");
+                    message("恢复成功");
+                    break;
+                }
+            }
+
+            if (confirm("是否进行备份")) {
+                    system("bk.bat");
+                    message("备份成功");
+                    fclose(stu_f);
+                    fclose(cor_f);
+                    stu_f = fopen("students.bak", "r");
+                    cor_f = fopen("course.bak", "r");
+            }
+
             break;
         }
     }
+    fclose(stu_f);
+    fclose(cor_f);
 }

@@ -36,6 +36,8 @@ void addCourse(courseList *clist, courseList *head)
 /////////////////////
 void removeCourse(courseList *clist,courseList *head)
 {
+    if (clist == NULL ||head == NULL)
+        return ;
     courseList *p,*q;
     p=head;
 
@@ -201,9 +203,10 @@ courseList *majorsearch(int major,int grade,int type,courseList *head)
 
 courseList *searchCourseByID(courseList *clist, int id)
 {
+    if (clist == NULL)
+        return NULL;
     while (clist != NULL) {
-        if (clist -> next == NULL)
-            getch();
+
         if (clist -> id == id)
             return clist;
         else clist = clist -> next;
