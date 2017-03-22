@@ -358,6 +358,8 @@ void dialog(const char *text)
 
 bool confirm(const char *text)
 {
+    while(kbhit())
+        getch();
     const int x = 37, y = 11;
     setColor(BASIC_COLOR);
     clearRectMap();

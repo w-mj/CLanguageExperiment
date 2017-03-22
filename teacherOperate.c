@@ -247,8 +247,10 @@ courseList *_addCourse(void)
             showChoiceBox(type[i]);
         for(int i = 0; i < 8; i++)
             showChoiceBox(major[i]);
-        if (inInputList)
+        if (inInputList) {
+            setColor(BASIC_COLOR);
             cmd = input(list[focus]);
+        }
         else
             cmd = getKeyboard();
         clearMsg(BASIC_COLOR);

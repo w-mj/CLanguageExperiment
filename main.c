@@ -4,6 +4,7 @@
 #include "surface.h"
 #include "courseList.h"
 #include "studentsInformation.h"
+#include "teacherOperate.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -34,10 +35,14 @@ int main(void)
     while(!quit) {
 
         cmd = menu(currentStudent);
+        setColor(BASIC_COLOR);
         switch(cmd) {
             case 0:
                 while(1) {
+                    setColor(BASIC_COLOR);
                     courseID = election(clist, currentStudent);
+                    while(kbhit())
+                        getch();
                     if (courseID == -1)
                         break;
                     if (currentStudent -> id == 0) {
@@ -64,7 +69,13 @@ int main(void)
                             dialog("选课成功，您的学分已经足够");
                             break;
                         case 2:
-                            dialog("您已经选过该门课程，请勿重复选课");
+                            getch();
+                            if (confirm("您已经选过该门课程，是否要删除这门课"))
+                                deletecourse(courseID, currentStudent, clist);
+                            break;
+                        default:
+                            sprintf(temp, "%d", ret);
+                            dialog(temp);
                             break;
                         }
                     }

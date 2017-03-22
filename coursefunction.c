@@ -2,6 +2,7 @@
 #include<stdlib.h>
 #include<string.h>
 #include"courseList.h"
+#include <conio.h>
 void addCourse(courseList *clist, courseList *head)
 {
     courseList *p;

@@ -4,6 +4,8 @@
 #include <stdbool.h>
 #include"studentsInformation.h"
 #include "courseList.h"
+#include "surface.h"
+#include "graph.h"
 
 
 int studentnum;//已注册学生数
